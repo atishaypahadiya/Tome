@@ -1,6 +1,6 @@
 """Analysis: smart classification, dead imports, circular deps, runtime edges, module health."""
 
-from config import FILE_CATEGORIES, BUILD_FILENAMES, PYTHON_EXTENSIONS, JS_TS_EXTENSIONS
+from tome.config import FILE_CATEGORIES, BUILD_FILENAMES, PYTHON_EXTENSIONS, JS_TS_EXTENSIONS
 
 
 # ---------- reverse deps + classification ------------------------------------

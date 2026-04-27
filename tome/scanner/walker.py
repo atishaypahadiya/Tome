@@ -3,7 +3,7 @@
 import fnmatch
 import os
 
-from config import (
+from tome.config import (
     IGNORE_DIRS, BINARY_EXTENSIONS, MAX_FILE_SIZE, ENTRY_POINT_FILENAMES,
 )
 from tome.scanner.parsers import get_parser_for_extension

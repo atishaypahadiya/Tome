@@ -1,0 +1,87 @@
+:root {
+  --bg-primary: #080c14;
+  --bg-secondary: #060a12;
+  --bg-card: #0e1420;
+  --border: #182030;
+  --text-primary: #e0e6ee;
+  --text-secondary: #7c8a9a;
+  --text-dim: #3a4458;
+
+  /* Monochromatic status palette — desaturated, space-tech */
+  --status-ok: #8aacca;
+  --status-warn: #a09488;
+  --status-error: #b08888;
+  --status-info: #7898b8;
+  --status-inactive: #2e3848;
+
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --sidebar-width: 280px;
+  --header-height: 44px;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Panel overlay glass effect */
+.panel-glass {
+  backdrop-filter: blur(16px) saturate(120%);
+  background: rgba(6, 10, 18, 0.88);
+}
+
+::selection {
+  background: rgba(120, 152, 184, 0.3);
+  color: var(--text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -20; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 4px currentColor; }
+  50% { box-shadow: 0 0 8px currentColor, 0 0 12px currentColor; }
+}
