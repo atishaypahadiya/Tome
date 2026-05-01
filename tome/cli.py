@@ -20,16 +20,15 @@ from tome.scanner.differ import diff_scans
 def _auto_output_name():
     """Pick the next available 'tome-scan.json' / 'tome-scan 2.json' / ... in cwd."""
     prefix = "tome-scan"
-    existing = _glob.glob(f"{prefix}*.json")
-    if not existing:
-        return f"{prefix}.json"
+    base = f"{prefix}.json"
+    if not os.path.exists(base):
+        return base
     highest = 1
-    pat = re.compile(re.escape(prefix) + r'(?:\s+(\d+))?\.json$')
-    for name in existing:
+    pat = re.compile(re.escape(prefix) + r'\s+(\d+)\.json$')
+    for name in _glob.glob(f"{prefix} *.json"):
         m = pat.match(name)
         if m:
-            num = int(m.group(1)) if m.group(1) else 1
-            highest = max(highest, num)
+            highest = max(highest, int(m.group(1)))
     return f"{prefix} {highest + 1}.json"
 
 
@@ -115,8 +114,7 @@ def _add_scan_parser(sub):
     p.add_argument('--verbose', '-v', action='store_true', help='Print progress')
     p.add_argument('--no-git', action='store_true', help='Skip git analysis')
     p.add_argument('--diff', metavar='PREV', default=None, help='Diff against a previous scan JSON')
-    p.add_argument('--json-pretty', action='store_true', help='Pretty-print JSON (default: pretty)')
-    p.add_argument('--json-compact', action='store_true', help='Minified JSON output')
+    p.add_argument('--json-compact', action='store_true', help='Minified JSON output (default: pretty)')
     p.add_argument('--summary', action='store_true', help='Print human-readable summary')
     p.add_argument('--view', action='store_true', help='Serve the result in a browser after scanning')
     p.add_argument('--port', type=int, default=None, help='(with --view) Port for the viewer server')
@@ -214,8 +212,8 @@ def _add_view_parser(sub):
 
 
 def _most_recent_scan_in_cwd():
-    """Return path of most-recent *.json scan in cwd, or None."""
-    candidates = sorted(_glob.glob("*.json"), key=os.path.getmtime, reverse=True)
+    """Return path of most-recent tome-scan*.json in cwd, or None."""
+    candidates = sorted(_glob.glob("tome-scan*.json"), key=os.path.getmtime, reverse=True)
     return candidates[0] if candidates else None
 
 

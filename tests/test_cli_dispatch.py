@@ -4,7 +4,7 @@ import subprocess
 
 
 def _run(*args):
-    return subprocess.run(["tome", *args], capture_output=True, text=True)
+    return subprocess.run(["tome", *args], capture_output=True, text=True, timeout=10)
 
 
 def test_top_level_help_lists_subcommands():
