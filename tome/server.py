@@ -7,7 +7,7 @@ special-case route for the scan data the visualizer should display.
 import importlib.resources
 import json
 import mimetypes
-import sys
+import posixpath
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -23,7 +23,7 @@ def _bundle_root() -> Path:
 
 def build_handler(scan_data: dict):
     """Construct a request handler class closed over the loaded scan data."""
-    bundle_root = _bundle_root()
+    bundle_root = _bundle_root().resolve()
     encoded_scan = json.dumps(scan_data).encode("utf-8")
 
     class Handler(BaseHTTPRequestHandler):
@@ -31,7 +31,8 @@ def build_handler(scan_data: dict):
             pass
 
         def do_GET(self):
-            if self.path == "/api/scan-data.json":
+            clean_path = self.path.split("?", 1)[0]
+            if clean_path == "/api/scan-data.json":
                 self._send(200, "application/json", encoded_scan)
                 return
             self._serve_static(self.path)
@@ -43,7 +44,7 @@ def build_handler(scan_data: dict):
 
             target = (bundle_root / path).resolve()
             try:
-                target.relative_to(bundle_root.resolve())
+                target.relative_to(bundle_root)
             except ValueError:
                 self._send(404, "text/plain", b"not found")
                 return
@@ -53,6 +54,12 @@ def build_handler(scan_data: dict):
                 self._send(200, ctype or "application/octet-stream", target.read_bytes())
                 return
 
+            # SPA fallback only for paths without an extension - missing assets
+            # (e.g. /missing.css) should 404 so broken bundles are obvious.
+            _, ext = posixpath.splitext(path)
+            if ext:
+                self._send(404, "text/plain", b"not found")
+                return
             index = bundle_root / "index.html"
             if index.is_file():
                 self._send(200, "text/html", index.read_bytes())
@@ -107,4 +114,3 @@ def serve(scan_path: str, port: int | None = None, open_browser: bool = True):
     finally:
         server.shutdown()
         server.server_close()
-        sys.exit(0)

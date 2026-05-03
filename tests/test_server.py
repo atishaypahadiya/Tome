@@ -13,8 +13,6 @@ from tome.server import build_handler, ThreadingHTTPServer
 @pytest.fixture
 def running_server(tmp_path):
     scan = {"files": [], "edges": [], "metadata": {"scanned_path": "/tmp"}}
-    scan_path = tmp_path / "scan.json"
-    scan_path.write_text(json.dumps(scan))
 
     handler_cls = build_handler(scan_data=scan)
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler_cls)
@@ -52,3 +50,13 @@ def test_unknown_path_falls_back_to_index_html(running_server):
     assert r.status == 200
     body = r.read().decode()
     assert "<html" in body.lower() or "<!doctype" in body.lower()
+
+
+def test_missing_asset_returns_404_not_html(running_server):
+    """Paths with extensions (e.g. /missing.css) should 404, not silently fall back to index.html."""
+    import urllib.error
+    try:
+        urllib.request.urlopen(f"http://127.0.0.1:{running_server}/missing.css", timeout=2)
+        assert False, "should have raised HTTPError 404"
+    except urllib.error.HTTPError as e:
+        assert e.code == 404
