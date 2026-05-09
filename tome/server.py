@@ -35,7 +35,7 @@ def build_handler(scan_data: dict):
             if clean_path == "/api/scan-data.json":
                 self._send(200, "application/json", encoded_scan)
                 return
-            self._serve_static(self.path)
+            self._serve_static(clean_path)
 
         def _serve_static(self, raw_path: str):
             path = raw_path.split("?", 1)[0].lstrip("/")
