@@ -7,7 +7,6 @@ shape is preserved.
 
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 
@@ -18,13 +17,12 @@ EXPECTED_TOP_KEYS = {"files", "edges", "metadata", "runtime_edges", "env_vars", 
 def test_scan_repo_produces_expected_keys(tmp_path):
     """Scanning the tome repo itself should produce JSON with all expected keys."""
     out = tmp_path / "scan.json"
-    # We invoke via subprocess to exercise the real entry point.
-    # Switch this command in Task 10 once `tome` is installed.
     result = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scan.py"), str(REPO_ROOT), "-o", str(out), "--no-git"],
+        ["tome", "scan", str(REPO_ROOT), "-o", str(out), "--no-git"],
         capture_output=True,
         text=True,
         cwd=tmp_path,
+        timeout=60,
     )
     assert result.returncode == 0, f"scan failed:\nstdout={result.stdout}\nstderr={result.stderr}"
     assert out.exists(), "scan did not produce output file"
