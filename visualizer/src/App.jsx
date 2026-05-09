@@ -25,15 +25,29 @@ export default function App() {
   const [showSimBar, setShowSimBar] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
 
-  // Load sample data on mount
+  // Load scan data: prefer the live API (served by `tome view`),
+  // fall back to bundled sample data (so `npm run dev` works standalone).
   useEffect(() => {
-    fetch('/sample-data.json')
-      .then(res => res.json())
-      .then(data => {
-        if (validateScanData(data)) setScanData(data);
-        else setScanData(FALLBACK_DATA);
-      })
-      .catch(() => setScanData(FALLBACK_DATA));
+    const tryLoad = async () => {
+      const apiRes = await fetch('/api/scan-data.json').catch(() => null);
+      if (apiRes && apiRes.ok) {
+        const data = await apiRes.json();
+        if (validateScanData(data)) {
+          setScanData(data);
+          return;
+        }
+      }
+      const sampleRes = await fetch('/sample-data.json').catch(() => null);
+      if (sampleRes && sampleRes.ok) {
+        const data = await sampleRes.json();
+        if (validateScanData(data)) {
+          setScanData(data);
+          return;
+        }
+      }
+      setScanData(FALLBACK_DATA);
+    };
+    tryLoad();
   }, []);
 
   // Compute file-level layout
